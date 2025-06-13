@@ -2,6 +2,7 @@ const appRoot = require('app-root-path');
 const config = require(appRoot + '/config/config.js');
 var createError = require('http-errors');
 var express = require('express');
+const fs = require('fs');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
@@ -9,14 +10,30 @@ var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var punksRouter = require('./routes/punks');
 
+// ... existing requires
+const incrementVisitorCount = require('./visitorCounter');
+
 var app = express();
 
-if (app.get('env') === 'development') {
-  var livereload = require('easy-livereload');
-  app.use(livereload({
-    app: app
-  }));
-}
+
+
+// ✨ Allow this site to be embedded in any iframe
+app.use((req, res, next) => {
+  // Remove any existing X-Frame-Options header
+  res.removeHeader('X-Frame-Options');
+  // Allow any origin to frame this content (for more control, replace '*' with specific domains)
+  res.setHeader('Content-Security-Policy', "frame-ancestors *");
+  // Older browsers fallback
+  res.setHeader('X-Frame-Options', 'ALLOWALL');
+  res.on('finish', () => {
+    console.log(`REQUEST : ${req.originalUrl}`);
+    if (res.statusCode === 200) {
+      const visitCount = incrementVisitorCount();
+      console.log(`Visitor count: ${visitCount} REQUEST : ${req.originalUrl}`);
+    }
+  });
+  next();
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
