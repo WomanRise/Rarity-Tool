@@ -6,7 +6,7 @@
   "author": "Fukuball",
   "license": "MIT",
   "scripts": {
-    "start": "set NODE_ENV=production node ./bin/www",
+    "start": "node ./bin/www",
     "start-dev": "set NODE_ENV=development node-dev ./bin/www",
     "postinstall": "node ./cmd/rarity_analyze.js && node ./cmd/rarity_analyze_normalized.js",
     "rarity-analyze": "node ./cmd/rarity_analyze.js --mode=force && node ./cmd/rarity_analyze_normalized.js --mode=force",
